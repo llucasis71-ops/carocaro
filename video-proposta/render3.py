@@ -15,7 +15,8 @@ MB = f"{FONTS}/fontsource-montserrat-5.0.19/package/files/montserrat-latin-900-n
 MBI = f"{FONTS}/fontsource-montserrat-5.0.19/package/files/montserrat-latin-900-italic.woff"
 M8 = f"{FONTS}/fontsource-montserrat-5.0.19/package/files/montserrat-latin-800-normal.woff"
 M7 = f"{FONTS}/fontsource-montserrat-5.0.19/package/files/montserrat-latin-700-normal.woff"
-YEL, INK, WHITE = (255, 201, 40), (17, 17, 17), (255, 255, 255)
+ACC, INK, WHITE = (217, 12, 21), (17, 17, 17), (255, 255, 255)   # ACC = red from the brand logo
+MAROON_TOP, MAROON_BOT = (96, 32, 23), (40, 22, 18)
 RED, GREEN = (240, 68, 68), (34, 197, 94)
 
 HOOK_END = 6.567
@@ -110,7 +111,7 @@ def sfx(kind, t, gain=1.0): SFX.append((kind, t, gain))
 def anton(txt, size, style="ink", maxw=1040, track=0, stretch=1.0, maxh=None):
     f = font(ANTON, size)
     if style == "ink": spr = text_sprite(txt, f, INK, tracking=track)
-    elif style == "yellow": spr = text_sprite(txt, f, YEL, stroke=max(5, size // 40), stroke_fill=INK, tracking=track)
+    elif style == "red": spr = text_sprite(txt, f, ACC, stroke=max(5, size // 40), stroke_fill=INK, tracking=track)
     elif style == "white": spr = text_sprite(txt, f, WHITE, stroke=max(4, size // 50), stroke_fill=INK, tracking=track)
     elif style == "outline": spr = text_sprite(txt, f, (0, 0, 0, 0), stroke=max(4, size // 45), stroke_fill=INK, tracking=track)
     if stretch != 1.0: spr = spr.resize((spr.width, int(spr.height * stretch)), Image.LANCZOS)
@@ -214,7 +215,7 @@ def ring(fr, x, y, r0, t, color=WHITE, width=7):
         ang = k * math.pi / 4 + 0.39
         r1, r2 = r0 * (1.0 + 0.8 * ease_out(t)), r0 * (1.2 + 1.1 * ease_out(t))
         d.line((R + r1 * math.cos(ang), R + r1 * math.sin(ang), R + r2 * math.cos(ang), R + r2 * math.sin(ang)),
-               fill=YEL + (a,), width=6)
+               fill=ACC + (a,), width=6)
     place(fr, patch, x, y)
 
 def icon_pop(layer, spr, t0, t1, x, y, sound="pop", bob=10, tilt=-14, burst=True):
@@ -259,6 +260,7 @@ def darken_at(t):
 
 # ================= TIMELINE =================
 IG, WA = icon("instagram", 200), icon("whatsapp", 200)
+LOGO = Image.open(f"{ICONS}/../logo/logo.png").convert("RGBA")
 IGs, WAs = icon("instagram", 160), icon("whatsapp", 160)
 
 # hook: question badge on "O que nós vendemos aqui?"
@@ -266,8 +268,8 @@ icon_pop(FRONT, icon("question", 170), 3.9, 5.2, 890, 640)
 TX = tall("COMMODITY"); blur_in(BEHIND, TX, 6.0, 6.95, 540, top(TX))
 
 # farinha de mandioca
-TX = tall("FARINHA DE MANDIOCA  —  ", "yellow", maxw=99999); marquee(BEHIND, TX, 7.15, 9.15, top(TX), speed=-950)
-box_wipe(FRONT, "100% MANDIOCA", font(ANTON, 104), YEL, INK, 7.9, 9.05, 540, 1330)
+TX = tall("FARINHA DE MANDIOCA  —  ", "red", maxw=99999); marquee(BEHIND, TX, 7.15, 9.15, top(TX), speed=-950)
+box_wipe(FRONT, "100% MANDIOCA", font(ANTON, 104), ACC, WHITE, 7.9, 9.05, 540, 1330)
 icon_pop(FRONT, icon("wheat", 170), 7.35, 9.05, 150, 1010)
 icon_pop(FRONT, icon("package", 170), 7.6, 9.05, 930, 1010, tilt=14, sound=None)
 
@@ -277,7 +279,7 @@ icon_pop(FRONT, IG, 10.62, 13.0, 190, 830)
 icon_pop(FRONT, WA, 11.28, 13.0, 890, 830, tilt=14)
 char_reveal(FRONT, "PRO", font(MB, 64), WHITE, 11.95, 14.35, 540, 1150, sound=None)
 char_reveal(FRONT, "CONSUMIDOR", font(ANTON, 150), WHITE, 12.6, 14.35, 540, 1265, stroke=4, stroke_fill=INK)
-box_wipe(FRONT, "FINAL", font(ANTON, 170), YEL, INK, 13.95, 14.35, 540, 1440)
+box_wipe(FRONT, "FINAL", font(ANTON, 170), ACC, WHITE, 13.95, 14.35, 540, 1440)
 icon_pop(FRONT, icon("cart", 150), 13.15, 14.35, 905, 1110, tilt=14)
 
 # não é atacado, é varejo
@@ -290,17 +292,17 @@ def draw_strike(fr, t, t0=15.55, t1=16.6):
     place(fr, patch, 300 - 20 + 270, 1175 + 40, 1, 1 - e[1])
 FRONT.append(draw_strike); sfx("swish", 15.5)
 icon_pop(FRONT, icon("x", 120), 15.62, 16.6, 900, 1120, sound=None)
-box_wipe(FRONT, "VAREJO", font(ANTON, 210), YEL, INK, 15.9, 16.6, 540, 1420, sound="impact")
+box_wipe(FRONT, "VAREJO", font(ANTON, 210), ACC, WHITE, 15.9, 16.6, 540, 1420, sound="impact")
 icon_pop(FRONT, icon("check", 130), 16.05, 16.6, 900, 1330, sound="pop")
 
 # sem loja, sem rua
 TX = tall("SEM LOJA"); blur_in(BEHIND, TX, 17.0, 18.6, 540, top(TX))
 icon_pop(FRONT, with_badge(icon("store", 200), icon("x", 120)), 17.85, 18.65, 175, 790)
-TX = tall("SEM RUA", "yellow"); blur_in(BEHIND, TX, 18.7, 20.75, 540, top(TX))
+TX = tall("SEM RUA", "red"); blur_in(BEHIND, TX, 18.7, 20.75, 540, top(TX))
 icon_pop(FRONT, with_badge(icon("users", 200), icon("x", 120)), 19.5, 20.75, 905, 790, tilt=14)
 
 # só instagram + whatsapp
-TX = tall("SÓ", "yellow", maxh=900, stretch=1.6); blur_in(BEHIND, TX, 21.0, 22.1, 290, top(TX), k0=1.6, sound="impact")
+TX = tall("SÓ", "red", maxh=900, stretch=1.6); blur_in(BEHIND, TX, 21.0, 22.1, 290, top(TX), k0=1.6, sound="impact")
 icon_pop(FRONT, IG, 22.12, 23.6, 330, 1240)
 char_reveal(FRONT, "+", font(MB, 150), WHITE, 22.7, 23.6, 540, 1240, sound=None)
 icon_pop(FRONT, WA, 23.02, 23.6, 750, 1240, tilt=14)
@@ -311,7 +313,7 @@ DARKEN.append((23.9, 25.1, 0.45))
 char_reveal(FRONT, "VENDE MAIS DE", font(MB, 84), WHITE, 24.2, 25.05, 540, 1240, stagger=0.03)
 flash(COUNT_T0); shake(COUNT_T0); sfx("shutter", COUNT_T0 - 0.02); sfx("cash", COUNT_T1); sfx("coins", COUNT_T1 + 0.05)
 glow = Image.new("RGBA", (1000, 520), (0, 0, 0, 0))
-ImageDraw.Draw(glow).ellipse((100, 90, 900, 430), fill=(255, 190, 30, 170)); glow = glow.filter(ImageFilter.GaussianBlur(70))
+ImageDraw.Draw(glow).ellipse((100, 90, 900, 430), fill=(255, 60, 50, 140)); glow = glow.filter(ImageFilter.GaussianBlur(70))
 _cc = {}
 def draw_counter(fr, t):
     e = env(t, COUNT_T0, MONEY_END, 0.15, 0.3)
@@ -320,7 +322,7 @@ def draw_counter(fr, t):
     v = int(round(40 * ease_out((t - COUNT_T0) / (COUNT_T1 - COUNT_T0))))
     key = f"R$ {v}.000" if v else "R$ 0"
     if key not in _cc:
-        cs = text_sprite(key, font(ANTON, 330), YEL, stroke=9, stroke_fill=INK)
+        cs = text_sprite(key, font(ANTON, 330), ACC, stroke=9, stroke_fill=INK)
         cs = cs.resize((cs.width, int(cs.height * 1.7)), Image.LANCZOS)
         _cc[key] = fitw(shadowed(cs, blur=20, off=(0, 12), alpha=110, pad=30), 1060)
     pulse = 1 + 0.08 * math.sin(min(max((t - COUNT_T1) / 0.25, 0), 1) * math.pi)
@@ -368,7 +370,7 @@ for i, (x, t0) in enumerate([(270, 31.1), (540, 31.24), (810, 31.38)]):
 
 # o pulo do gato
 char_reveal(FRONT, "O PULO", font(ANTON, 140), WHITE, 32.55, 34.0, 540, 1220, stroke=4, stroke_fill=INK)
-box_wipe(FRONT, "DO GATO", font(ANTON, 200), YEL, INK, 33.15, 34.0, 540, 1400, sound="impact")
+box_wipe(FRONT, "DO GATO", font(ANTON, 200), ACC, WHITE, 33.15, 34.0, 540, 1400, sound="impact")
 CAT = icon("cat", 190)
 def draw_cat(fr, t, t0=32.7, t1=33.9):
     if not (t0 <= t <= t1 + 0.25): return
@@ -384,7 +386,7 @@ TX = tall("PRODUTO", "outline"); blur_in(BEHIND, TX, 34.25, 35.05, 540, top(TX),
 icon_pop(FRONT, icon("x", 130), 34.45, 35.05, 905, 880)
 
 # estratégias
-TX = tall("ESTRATÉGIA  —  ", "yellow", maxw=99999); marquee(BEHIND, TX, 35.3, 38.5, top(TX), speed=700)
+TX = tall("ESTRATÉGIA  —  ", "red", maxw=99999); marquee(BEHIND, TX, 35.3, 38.5, top(TX), speed=700)
 icon_pop(FRONT, icon("target", 170), 35.5, 38.5, 890, 880)
 icon_pop(FRONT, icon("brain", 170), 35.85, 38.5, 190, 880, tilt=14)
 icon_pop(FRONT, IGs, 37.9, 39.5, 330, 1290)
@@ -402,10 +404,12 @@ def draw_chart(fr, t, t0=40.4):
         pts.append((a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u))
     if len(pts) > 1:
         d = ImageDraw.Draw(fr)
-        d.line(pts, fill=INK + (255,), width=36, joint="curve"); d.line(pts, fill=GREEN + (255,), width=22, joint="curve")
-        ex, ey = pts[-1]; d.ellipse((ex - 24, ey - 24, ex + 24, ey + 24), fill=YEL + (255,), outline=INK, width=7)
+        d.line(pts, fill=INK + (255,), width=36, joint="curve"); d.line(pts, fill=ACC + (255,), width=22, joint="curve")
+        ex, ey = pts[-1]; d.ellipse((ex - 24, ey - 24, ex + 24, ey + 24), fill=WHITE + (255,), outline=INK, width=7)
 BEHIND.append(draw_chart); sfx("rise", 40.4)
-char_reveal(FRONT, "CRESCIMENTO", font(ANTON, 160), YEL, 41.3, 43.5, 540, 1230, stroke=6, stroke_fill=INK, stagger=0.025)
+char_reveal(FRONT, "CRESCIMENTO", font(ANTON, 160), ACC, 41.3, 42.0, 540, 1230, stroke=6, stroke_fill=INK, stagger=0.025)
+LOGO_BIG = shadowed(LOGO.resize((430, 430), Image.LANCZOS), blur=22, off=(0, 14), alpha=150, pad=40)
+icon_pop(FRONT, LOGO_BIG, 42.05, 43.6, 540, 1150, sound="impact", tilt=-8, bob=6)
 icon_pop(FRONT, icon("rocket", 170), 41.5, 43.5, 900, 300, tilt=14)
 
 pill_a = rounded(380, 120, 60, WHITE + (255,)); pd = ImageDraw.Draw(pill_a)
@@ -415,35 +419,36 @@ pill_b = rounded(440, 120, 60, (38, 38, 38, 255)); pd = ImageDraw.Draw(pill_b)
 pd.line((52, 62, 68, 78, 96, 44), fill=WHITE, width=9, joint="curve")
 s_ = text_sprite("Seguindo", font(MB, 54), WHITE); pill_b.alpha_composite(s_, (118, (120 - s_.height) // 2))
 pill_a, pill_b = shadowed(pill_a), shadowed(pill_b)
-CTA_T, TAP_T = 41.85, 42.55
+CTA_T, TAP_T = 42.35, 42.9
 def draw_cta(fr, t):
     if t < CTA_T: return
     p = back_out((t - CTA_T) / 0.45)
     if t < TAP_T:
-        place(fr, pill_a, 540, 1440, max(p, 0), min(1, (t - CTA_T) / 0.15))
+        place(fr, pill_a, 540, 1500, max(p, 0), min(1, (t - CTA_T) / 0.15))
     else:
         k = 1 - 0.08 * math.sin(min(1, (t - TAP_T) / 0.18) * math.pi)
-        place(fr, pill_b, 540, 1440, k)
+        place(fr, pill_b, 540, 1500, k)
         u = (t - TAP_T) / 0.5
         if u < 1:
             r = 30 + 90 * ease_out(u); patch = Image.new("RGBA", (int(2 * r) + 2, int(2 * r) + 2), (0, 0, 0, 0))
             ImageDraw.Draw(patch).ellipse((0, 0, 2 * r, 2 * r), fill=(255, 255, 255, int(90 * (1 - u))))
-            place(fr, patch, 650, 1450)
+            place(fr, patch, 650, 1510)
 sfx("pop", CTA_T); sfx("tap", TAP_T)
 
 # ---------------- hook card (covers burned-in text until 6.567s) ----------------
 CARD_CX, CARD_CY = 540, 1400
 card = Image.new("RGBA", (980, 470), (0, 0, 0, 0))
 cm = Image.new("L", card.size, 0); ImageDraw.Draw(cm).rounded_rectangle((0, 0, 979, 469), 46, fill=255)
-grad = np.linspace(34, 12, 470)[:, None].repeat(980, 1)
-cg = Image.fromarray(np.stack([grad] * 3, -1).astype(np.uint8)).convert("RGBA"); cg.putalpha(cm)
-ImageDraw.Draw(cg).rounded_rectangle((2, 2, 977, 467), 44, outline=YEL + (120,), width=3)
+u = np.linspace(0, 1, 470)[:, None, None]
+grad = (np.array(MAROON_TOP) * (1 - u) + np.array(MAROON_BOT) * u).repeat(980, 1)
+cg = Image.fromarray(grad.astype(np.uint8)).convert("RGBA"); cg.putalpha(cm)
+ImageDraw.Draw(cg).rounded_rectangle((2, 2, 977, 467), 44, outline=ACC + (200,), width=4)
 card = shadowed(cg, blur=24, off=(0, 14), alpha=170, pad=50)
-l1 = text_sprite("EU FATURO", font(M8, 46), YEL, tracking=10)
+l1 = text_sprite("EU FATURO", font(M8, 46), (255, 210, 200), tracking=10)
 money = {v: text_sprite(f"R$ {v} MIL", font(ANTON, 190), WHITE) for v in range(0, 41)}
 l3 = text_sprite("POR MÊS VENDENDO", font(M8, 54), WHITE)
-far = text_sprite("FARINHA", font(MB, 54), INK)
-far_pill = rounded(far.width + 32, far.height + 24, 12, YEL + (255,)); far_pill.alpha_composite(far, (16, 12))
+far = text_sprite("FARINHA", font(MB, 54), WHITE)
+far_pill = rounded(far.width + 32, far.height + 24, 12, ACC + (255,)); far_pill.alpha_composite(far, (16, 12))
 net = text_sprite("NA INTERNET", font(M8, 54), WHITE)
 def draw_hook(fr, t):
     if t > HOOK_END + 0.35: return
@@ -468,12 +473,14 @@ sfx("cash", 0.85, 0.6); sfx("snap", 1.15, 0.8)
 
 # ---------------- name tag ----------------
 nt_name = text_sprite("Roberto", font(MB, 60), WHITE)
-nt_role = text_sprite("FUNDADOR · SABORES DO MEU MARANHÃO", font(M7, 26), WHITE, tracking=2)
-tag_w = max(nt_name.width, nt_role.width) + 70
+nt_role = text_sprite("FUNDADOR", font(M7, 28), (255, 210, 200), tracking=6)
+nt_logo = LOGO.resize((122, 122), Image.LANCZOS)
+tag_w = 150 + max(nt_name.width, nt_role.width) + 50
 tag = Image.new("RGBA", (tag_w, 150), (0, 0, 0, 0))
-tag.alpha_composite(rounded(tag_w, 150, 20, (17, 17, 17, 215)))
-ImageDraw.Draw(tag).rounded_rectangle((22, 26, 30, 124), 4, fill=YEL + (255,))
-tag.alpha_composite(nt_name, (50, 24)); tag.alpha_composite(nt_role, (50, 24 + nt_name.height + 22))
+tag.alpha_composite(rounded(tag_w, 150, 75, MAROON_BOT + (235,)))
+ImageDraw.Draw(tag).rounded_rectangle((1, 1, tag_w - 2, 148), 75, outline=ACC + (255,), width=4)
+tag.alpha_composite(nt_logo, (14, 14))
+tag.alpha_composite(nt_name, (152, 30)); tag.alpha_composite(nt_role, (154, 30 + nt_name.height + 18))
 tag = shadowed(tag, blur=14, off=(0, 8), alpha=130, pad=30)
 def draw_tag(fr, t, t_in=0.5, t_out=3.7):
     if not (t_in <= t < t_out + 0.4): return
@@ -503,9 +510,13 @@ def build_chunks(words, max_words=3, max_chars=16):
     return out
 def cap_sprite(txt, col):
     return shadowed(text_sprite(txt, CAP_FONT, col, stroke=3, stroke_fill=(0, 0, 0)), blur=10, off=(0, 4), alpha=210, pad=20)
+def cap_active(txt):
+    tx = text_sprite(txt, CAP_FONT, WHITE)
+    box = rounded(tx.width + 28, tx.height + 24, 14, ACC + (255,)); box.alpha_composite(tx, (14, 12))
+    return shadowed(box, blur=10, off=(0, 4), alpha=170, pad=6)
 CHUNKS = build_chunks(WORDS)
 for c in CHUNKS:
-    for w in c["words"]: w["n"], w["a"] = cap_sprite(w["t"], WHITE), cap_sprite(w["t"], YEL)
+    for w in c["words"]: w["n"], w["a"] = cap_sprite(w["t"], WHITE), cap_active(w["t"])
 def draw_captions(fr, t):
     if any(a <= t < b for a, b in CAP_OFF): return
     y = 1080 if t < HOOK_END + 0.3 else 1560
@@ -521,10 +532,15 @@ def draw_captions(fr, t):
             place(fr, w["a"] if active else w["n"], x + wn / 2, y + 14 * (1 - pe), k0 * (1.08 if active else 1.0), pe, blur=5 * (1 - pe))
             x += wn + gap * k0
 
+LOGO_BUG = shadowed(LOGO.resize((118, 118), Image.LANCZOS), blur=10, off=(0, 5), alpha=130, pad=20)
+def draw_bug(fr, t, t0=6.8, t1=41.9):
+    e = env(t, t0, t1, 0.4, 0.3)
+    if e: place(fr, LOGO_BUG, W - 92, 120, 0.85 + 0.15 * ease_out(e[0]), ease_out(e[0]) * (1 - e[1]))
+
 def draw_progress(fr, t):
     bar = Image.new("RGBA", (W - 48, 8), (0, 0, 0, 0)); d = ImageDraw.Draw(bar)
     d.rounded_rectangle((0, 0, W - 49, 7), 4, fill=(255, 255, 255, 80))
-    d.rounded_rectangle((0, 0, max(8, int((W - 48) * t / DUR)), 7), 4, fill=YEL + (255,))
+    d.rounded_rectangle((0, 0, max(8, int((W - 48) * t / DUR)), 7), 4, fill=ACC + (255,))
     fr.alpha_composite(bar, (24, 22))
 
 def zoom_at(t):
@@ -615,6 +631,7 @@ while True:
     draw_tag(fr, t)
     for f_ in FRONT: f_(fr, t)
     draw_captions(fr, t)
+    draw_bug(fr, t)
     draw_cta(fr, t)
     out = fr.convert("RGB")
     # zoom-blur transitions (radial smear of the finished frame)

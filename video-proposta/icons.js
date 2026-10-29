@@ -17,11 +17,11 @@ save('instagram', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
 const badge = (name, icon, bg, fg, ring) => save(name, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
  <circle cx="50" cy="50" r="48" fill="${bg}"/>${ring ? `<circle cx="50" cy="50" r="45.5" fill="none" stroke="${ring}" stroke-width="3"/>` : ''}
  <g transform="translate(24 24) scale(2.1667)" fill="none" stroke="${fg}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${lu(icon)}</g></svg>`, 512);
-const Y = '#FFC928', K = '#111111', W = '#FFFFFF', R = '#F04444', G = '#22C55E';
-badge('wheat', 'wheat', Y, K); badge('store', 'store', W, K); badge('users', 'users', W, K);
-badge('house', 'house', Y, K); badge('target', 'target', K, Y, Y); badge('brain', 'brain', W, K);
-badge('trending', 'trending-up', G, W); badge('rocket', 'rocket', K, Y, Y); badge('cart', 'shopping-cart', Y, K);
-badge('banknote', 'banknote', G, W); badge('coins', 'hand-coins', Y, K); badge('x', 'x', R, W); badge('check', 'check', G, W);
-badge('cat', 'cat', Y, K); badge('mappin', 'map-pin', R, W); badge('package', 'package', W, K); badge('sparkles', 'sparkles', K, Y, Y);
+const Y = '#D90C15', K = '#111111', W = '#FFFFFF', R = '#D90C15', G = '#22C55E';
+badge('wheat', 'wheat', Y, W); badge('store', 'store', W, K); badge('users', 'users', W, K);
+badge('house', 'house', Y, W); badge('target', 'target', K, Y, Y); badge('brain', 'brain', W, K);
+badge('trending', 'trending-up', Y, W); badge('rocket', 'rocket', K, Y, Y); badge('cart', 'shopping-cart', Y, W);
+badge('banknote', 'banknote', G, W); badge('coins', 'hand-coins', Y, W); badge('x', 'x', R, W); badge('check', 'check', G, W);
+badge('cat', 'cat', Y, W); badge('mappin', 'map-pin', R, W); badge('package', 'package', W, K); badge('sparkles', 'sparkles', K, Y, Y);
 badge('question', 'message-circle-question', W, K);
 console.log('done');
