@@ -1,4 +1,4 @@
-import subprocess, sys, math
+import subprocess, sys, math, json, re
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -13,8 +13,10 @@ YEL = (255, 201, 40)
 INK = (14, 14, 14)
 
 HOOK_END = 6.567          # original burned-in text disappears here
-PHRASES = [7.3, 9.5, 14.7, 17.0, 21.0, 22.2, 23.8, 27.0, 29.5, 32.4, 36.6, 38.6, 40.0, 42.5]
+PHRASES = [7.28, 9.48, 14.70, 17.00, 21.06, 22.14, 23.76, 26.96, 29.50, 32.42, 35.03, 36.64, 38.62, 39.88, 42.48]
 ZOOMS = [1.10, 1.03, 1.14, 1.06]
+PUNCH = {23.76: 1.18}   # "a gente vende mais de 40 mil" gets the tightest framing
+WORDS = json.load(open(sys.argv[3])) if len(sys.argv) > 3 else []
 CTA_START = 40.0
 
 def font(path, size): return ImageFont.truetype(path, size)
@@ -112,15 +114,84 @@ pd = ImageDraw.Draw(plus); pd.rounded_rectangle((22, 0, 34, 55), 6, fill=INK); p
 pill = rounded(cta_txt.width + plus.width + 130, 132, 66, (255, 255, 255, 255))
 pill.alpha_composite(plus, (52, 38)); pill.alpha_composite(cta_txt, (52 + 56 + 26, (132 - cta_txt.height) // 2))
 pill = shadowed(pill)
-cta_top = shadowed(text_sprite("CURTIU? ENTÃO", font(XBOLD, 54), (255, 255, 255), stroke=6, stroke_fill=INK), blur=10, off=(0, 4))
 
 def draw_cta(fr, t):
     if t < CTA_START: return
     p = back_out((t - CTA_START - 0.15) / 0.5)
     pulse = 1 + 0.05 * math.sin((t - CTA_START) * 2 * math.pi * 1.4) * (t > CTA_START + 0.8)
-    q = ease_out((t - CTA_START) / 0.35)
-    place(fr, cta_top, 540, 1290 + 30 * (1 - q), 1, q)
-    place(fr, pill, 540, 1420, max(p, 0) * pulse, min(1, (t - CTA_START) / 0.2))
+    place(fr, pill, 540, 1360, max(p, 0) * pulse, min(1, (t - CTA_START) / 0.2))
+
+# ---------- word-by-word captions ----------
+CAP_Y = 1080
+CAP_FONT = font(BLACK, 78)
+KEYWORDS = {"ROBERTO", "SABORES", "MARANHÃO", "COMMODITY", "FARINHA", "MANDIOCA", "INSTAGRAM",
+            "WHATSAPP", "VAREJO", "40", "MIL", "REAIS", "PULO", "GATO", "ESTRATÉGIAS", "CRESCIMENTO"}
+
+def cap_word(w):
+    return re.sub(r"[,.?!]", "", w).upper()
+
+def build_chunks(words, max_words=3, max_chars=16):
+    chunks, cur = [], []
+    for i, w in enumerate(words):
+        txt = cap_word(w["w"])
+        if cur and (len(cur) >= max_words or sum(len(c["t"]) + 1 for c in cur) + len(txt) > max_chars
+                    or w["s"] - cur[-1]["e"] > 0.25):
+            chunks.append(cur); cur = []
+        cur.append({"t": txt, "s": w["s"], "e": w["e"]})
+        if re.search(r"[,.?!]$", w["w"]):
+            chunks.append(cur); cur = []
+    if cur: chunks.append(cur)
+    out = []
+    for i, c in enumerate(chunks):
+        nxt = chunks[i + 1][0]["s"] if i + 1 < len(chunks) else DUR
+        out.append({"words": c, "s": c[0]["s"], "e": min(nxt, c[-1]["e"] + 0.35)})
+    return out
+
+def word_sprites(txt):
+    col = YEL if txt in KEYWORDS else (255, 255, 255)
+    normal = shadowed(text_sprite(txt, CAP_FONT, col, stroke=8, stroke_fill=INK), blur=8, off=(0, 5), alpha=170, pad=20)
+    inner = text_sprite(txt, CAP_FONT, INK)
+    box = rounded(inner.width + 34, inner.height + 30, 18, (YEL if txt in KEYWORDS else (255, 255, 255)) + (255,))
+    box.alpha_composite(inner, (17, 15))
+    return normal, shadowed(box, blur=8, off=(0, 5), alpha=170, pad=20)
+
+CHUNKS = build_chunks(WORDS)
+for c in CHUNKS:
+    for w in c["words"]:
+        w["n"], w["a"] = word_sprites(w["t"])
+
+def draw_captions(fr, t):
+    for c in CHUNKS:
+        if not (c["s"] <= t < c["e"]): continue
+        ws = c["words"]
+        gap = -18   # sprites carry 20px shadow padding on each side
+        total = sum(w["n"].width for w in ws) + gap * (len(ws) - 1)
+        fit = min(1.0, 1000 / total)
+        pop = 0.82 + 0.18 * back_out((t - c["s"]) / 0.18)
+        x = 540 - total * fit * pop / 2
+        for w in ws:
+            active = w["s"] <= t < w["e"] + 0.05 or (w is ws[-1] and t >= w["s"])
+            spr = w["a"] if active else w["n"]
+            k = fit * pop * (1.06 if active else 1.0)
+            wn = w["n"].width * fit * pop
+            place(fr, spr, x + wn / 2, CAP_Y, k)
+            x += wn + gap * fit * pop
+
+# ---------- name tag ----------
+tag_name = text_sprite("ROBERTO", font(BLACK, 54), INK)
+tag_biz = text_sprite("SABORES DO MEU MARANHÃO", font(XBOLD, 36), (255, 255, 255))
+tag = Image.new("RGBA", (max(tag_name.width, tag_biz.width) + 70, 150), (0, 0, 0, 0))
+tag.alpha_composite(rounded(tag_name.width + 40, 66, 14, YEL + (255,)), (0, 0))
+tag.alpha_composite(tag_name, (20, (66 - tag_name.height) // 2))
+tag.alpha_composite(rounded(tag_biz.width + 40, 54, 14, INK + (235,)), (0, 76))
+tag.alpha_composite(tag_biz, (20, 76 + (54 - tag_biz.height) // 2))
+tag = shadowed(tag, blur=10, off=(0, 5), alpha=140, pad=20)
+TAG_IN, TAG_OUT = 0.5, 4.2
+
+def draw_tag(fr, t):
+    if not (TAG_IN <= t < TAG_OUT + 0.4): return
+    p = ease_out((t - TAG_IN) / 0.4) * (1 - ease_out((t - TAG_OUT) / 0.35))
+    place(fr, tag, 60 + tag.width / 2 - 120 * (1 - p), 330, 1, p)
 
 # ---------- progress bar ----------
 def draw_progress(fr, t):
@@ -133,7 +204,7 @@ def zoom_at(t):
     i = max(j for j, s in enumerate(PHRASES) if s <= t)
     end = PHRASES[i + 1] if i + 1 < len(PHRASES) else DUR
     prog = (t - PHRASES[i]) / (end - PHRASES[i])
-    return ZOOMS[i % len(ZOOMS)] + 0.025 * prog   # slow push within each phrase
+    return PUNCH.get(PHRASES[i], ZOOMS[i % len(ZOOMS)]) + 0.025 * prog   # slow push within each phrase
 
 dec = subprocess.Popen(["ffmpeg", "-v", "error", "-i", SRC, "-t", str(DUR), "-vf",
     "scale=1080:1920:flags=lanczos,eq=contrast=1.07:saturation=1.18:gamma=0.97,"
@@ -159,6 +230,8 @@ while True:
         img = img.resize((W, H), Image.BICUBIC, box=(x0, y0, x0 + cw, y0 + ch))
     fr = img.convert("RGBA")
     draw_hook(fr, 2.0 if n == 0 else t)   # frame 0 is the auto-thumbnail: show the finished headline
+    draw_tag(fr, t)
+    draw_captions(fr, t)
     draw_cta(fr, t)
     draw_progress(fr, t)
     enc.stdin.write(fr.convert("RGB").tobytes())
