@@ -107,13 +107,22 @@ BEHIND, FRONT, SFX = [], [], []
 def sfx(kind, t, gain=1.0): SFX.append((kind, t, gain))
 
 # ---------------- type styles ----------------
-def anton(txt, size, style="ink", maxw=1040, track=0):
+def anton(txt, size, style="ink", maxw=1040, track=0, stretch=1.0, maxh=None):
     f = font(ANTON, size)
     if style == "ink": spr = text_sprite(txt, f, INK, tracking=track)
     elif style == "yellow": spr = text_sprite(txt, f, YEL, stroke=max(5, size // 40), stroke_fill=INK, tracking=track)
     elif style == "white": spr = text_sprite(txt, f, WHITE, stroke=max(4, size // 50), stroke_fill=INK, tracking=track)
     elif style == "outline": spr = text_sprite(txt, f, (0, 0, 0, 0), stroke=max(4, size // 45), stroke_fill=INK, tracking=track)
-    return fitw(shadowed(spr, blur=18, off=(0, 12), alpha=90, pad=30), maxw)
+    if stretch != 1.0: spr = spr.resize((spr.width, int(spr.height * stretch)), Image.LANCZOS)
+    spr = fitw(shadowed(spr, blur=18, off=(0, 12), alpha=90, pad=30), maxw)
+    if maxh and spr.height > maxh: spr = scaled(spr, maxh / spr.height)
+    return spr
+
+def tall(txt, style="ink", maxh=640, maxw=1040, stretch=1.75):
+    """extra-tall condensed lettering for the words behind the speaker"""
+    return anton(txt, 300, style, maxw=maxw, stretch=stretch, maxh=maxh)
+
+def top(spr, y0=50): return y0 + spr.height / 2
 
 def mont(txt, size, fill=WHITE, italic=False, maxw=1000, shadow=True, track=0):
     spr = text_sprite(txt, font(MBI if italic else MB, size), fill, tracking=track)
@@ -254,16 +263,16 @@ IGs, WAs = icon("instagram", 160), icon("whatsapp", 160)
 
 # hook: question badge on "O que nós vendemos aqui?"
 icon_pop(FRONT, icon("question", 170), 3.9, 5.2, 890, 640)
-blur_in(BEHIND, anton("COMMODITY", 260, "ink"), 6.0, 6.95, 540, 360)
+TX = tall("COMMODITY"); blur_in(BEHIND, TX, 6.0, 6.95, 540, top(TX))
 
 # farinha de mandioca
-marquee(BEHIND, anton("FARINHA DE MANDIOCA  —  ", 330, "yellow", maxw=99999), 7.15, 9.15, 260, speed=-950)
+TX = tall("FARINHA DE MANDIOCA  —  ", "yellow", maxw=99999); marquee(BEHIND, TX, 7.15, 9.15, top(TX), speed=-950)
 box_wipe(FRONT, "100% MANDIOCA", font(ANTON, 104), YEL, INK, 7.9, 9.05, 540, 1330)
 icon_pop(FRONT, icon("wheat", 170), 7.35, 9.05, 150, 1010)
 icon_pop(FRONT, icon("package", 170), 7.6, 9.05, 930, 1010, tilt=14, sound=None)
 
 # apenas instagram e whatsapp
-blur_in(BEHIND, anton("APENAS", 380, "ink"), 10.1, 11.65, 540, 270)
+TX = tall("APENAS"); blur_in(BEHIND, TX, 10.1, 11.65, 540, top(TX))
 icon_pop(FRONT, IG, 10.62, 13.0, 190, 830)
 icon_pop(FRONT, WA, 11.28, 13.0, 890, 830, tilt=14)
 char_reveal(FRONT, "PRO", font(MB, 64), WHITE, 11.95, 14.35, 540, 1150, sound=None)
@@ -285,13 +294,13 @@ box_wipe(FRONT, "VAREJO", font(ANTON, 210), YEL, INK, 15.9, 16.6, 540, 1420, sou
 icon_pop(FRONT, icon("check", 130), 16.05, 16.6, 900, 1330, sound="pop")
 
 # sem loja, sem rua
-blur_in(BEHIND, anton("SEM LOJA", 360, "ink"), 17.0, 18.6, 540, 270)
+TX = tall("SEM LOJA"); blur_in(BEHIND, TX, 17.0, 18.6, 540, top(TX))
 icon_pop(FRONT, with_badge(icon("store", 200), icon("x", 120)), 17.85, 18.65, 175, 790)
-blur_in(BEHIND, anton("SEM RUA", 380, "yellow"), 18.7, 20.75, 540, 270)
+TX = tall("SEM RUA", "yellow"); blur_in(BEHIND, TX, 18.7, 20.75, 540, top(TX))
 icon_pop(FRONT, with_badge(icon("users", 200), icon("x", 120)), 19.5, 20.75, 905, 790, tilt=14)
 
 # só instagram + whatsapp
-blur_in(BEHIND, anton("SÓ", 640, "yellow"), 21.0, 22.1, 300, 420, k0=1.6, sound="impact")
+TX = tall("SÓ", "yellow", maxh=900, stretch=1.6); blur_in(BEHIND, TX, 21.0, 22.1, 290, top(TX), k0=1.6, sound="impact")
 icon_pop(FRONT, IG, 22.12, 23.6, 330, 1240)
 char_reveal(FRONT, "+", font(MB, 150), WHITE, 22.7, 23.6, 540, 1240, sound=None)
 icon_pop(FRONT, WA, 23.02, 23.6, 750, 1240, tilt=14)
@@ -310,10 +319,13 @@ def draw_counter(fr, t):
     p, q = e
     v = int(round(40 * ease_out((t - COUNT_T0) / (COUNT_T1 - COUNT_T0))))
     key = f"R$ {v}.000" if v else "R$ 0"
-    if key not in _cc: _cc[key] = fitw(shadowed(text_sprite(key, font(ANTON, 330), YEL, stroke=9, stroke_fill=INK), blur=20, off=(0, 12), alpha=110, pad=30), 1060)
+    if key not in _cc:
+        cs = text_sprite(key, font(ANTON, 330), YEL, stroke=9, stroke_fill=INK)
+        cs = cs.resize((cs.width, int(cs.height * 1.7)), Image.LANCZOS)
+        _cc[key] = fitw(shadowed(cs, blur=20, off=(0, 12), alpha=110, pad=30), 1060)
     pulse = 1 + 0.08 * math.sin(min(max((t - COUNT_T1) / 0.25, 0), 1) * math.pi)
-    place(fr, glow, 540, 250, 1 + 0.05 * math.sin(t * 6), 0.85 * (1 - q))
-    place(fr, _cc[key], 540, 250, (0.75 + 0.25 * ease_out(p)) * pulse * (1 + 0.02 * (t - COUNT_T0)), 1 - q, blur=12 * q)
+    place(fr, glow, 540, 330, 1.2 + 0.05 * math.sin(t * 6), 0.85 * (1 - q))
+    place(fr, _cc[key], 540, 50 + _cc[key].height / 2, (0.75 + 0.25 * ease_out(p)) * pulse * (1 + 0.02 * (t - COUNT_T0)), 1 - q, blur=12 * q)
 BEHIND.append(draw_counter)
 box_wipe(FRONT, "POR MÊS", font(ANTON, 190), WHITE, INK, 26.9, MONEY_END, 540, 1250, sound="impact")
 icon_pop(FRONT, icon("coins", 160), 27.1, 29.2, 150, 1060)
@@ -329,8 +341,8 @@ def bill(w=170):
 BILLS = [bill(w) for w in (130, 160, 190)]
 PARTS = []
 for i in range(30):
-    PARTS.append(dict(spr=random.choice(BILLS), t0=COUNT_T1 + random.uniform(0, 0.2), x=540 + random.uniform(-160, 160), y=300,
-                      vx=random.uniform(-820, 820), vy=random.uniform(-1600, -700), rot=random.uniform(-40, 40),
+    PARTS.append(dict(spr=random.choice(BILLS), t0=COUNT_T1 + random.uniform(0, 0.2), x=540 + random.uniform(-160, 160), y=780,
+                      vx=random.uniform(-900, 900), vy=random.uniform(-1050, -450), rot=random.uniform(-40, 40),
                       vr=random.uniform(-300, 300), flip=random.uniform(4, 10), g=2300))
 for i in range(20):
     PARTS.append(dict(spr=random.choice(BILLS), t0=26.3 + random.uniform(0, 2.4), x=random.uniform(40, 1040), y=-100,
@@ -350,7 +362,7 @@ def draw_money(fr, t):
 FRONT.append(draw_money)
 
 # tradicional / casas / norte
-blur_in(BEHIND, anton("TRADICIONAL", 330, "ink"), 30.1, 31.95, 540, 270)
+TX = tall("TRADICIONAL"); blur_in(BEHIND, TX, 30.1, 31.95, 540, top(TX))
 for i, (x, t0) in enumerate([(270, 31.1), (540, 31.24), (810, 31.38)]):
     icon_pop(FRONT, icon("house", 150), t0, 31.95, x, 1290, sound="pop" if i == 0 else "tick", tilt=0)
 
@@ -368,11 +380,11 @@ def draw_cat(fr, t, t0=32.7, t1=33.9):
     x, y = path(u); a = 1 - ease_out((t - t1) / 0.25) if t > t1 else 1
     place(fr, CAT, x, y, 1, a, -25 + 50 * u)
 FRONT.append(draw_cat); sfx("whoosh_long", 32.65)
-blur_in(BEHIND, anton("PRODUTO", 360, "outline"), 34.25, 35.05, 540, 270, sound=None)
+TX = tall("PRODUTO", "outline"); blur_in(BEHIND, TX, 34.25, 35.05, 540, top(TX), sound=None)
 icon_pop(FRONT, icon("x", 130), 34.45, 35.05, 905, 880)
 
 # estratégias
-marquee(BEHIND, anton("ESTRATÉGIA  —  ", 330, "yellow", maxw=99999), 35.3, 38.5, 260, speed=700)
+TX = tall("ESTRATÉGIA  —  ", "yellow", maxw=99999); marquee(BEHIND, TX, 35.3, 38.5, top(TX), speed=700)
 icon_pop(FRONT, icon("target", 170), 35.5, 38.5, 890, 880)
 icon_pop(FRONT, icon("brain", 170), 35.85, 38.5, 190, 880, tilt=14)
 icon_pop(FRONT, IGs, 37.9, 39.5, 330, 1290)
@@ -572,7 +584,7 @@ enc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_f
     "-filter_complex",
     "[1:a]highpass=f=80,acompressor=threshold=0.1:ratio=3:attack=5:release=120,loudnorm=I=-15:TP=-2:LRA=8,aresample=48000,"
     "aformat=channel_layouts=stereo,asplit=2[v][key];"
-    "[3:a]volume=0.30[mus];[mus][key]sidechaincompress=threshold=0.02:ratio=8:attack=15:release=350:makeup=1[duck];"
+    "[3:a]volume=0.55[mus];[mus][key]sidechaincompress=threshold=0.08:ratio=2.5:attack=20:release=300:makeup=1[duck];"
     "[2:a]aformat=channel_layouts=stereo,volume=0.7[s];"
     "[v][duck][s]amix=inputs=3:normalize=0:duration=first,alimiter=limit=0.89[a]",
     "-map", "0:v", "-map", "[a]", "-c:v", "libx264", "-preset", "slow", "-crf", "19", "-pix_fmt", "yuv420p", "-profile:v", "high",
