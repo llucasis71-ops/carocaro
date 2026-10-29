@@ -1,0 +1,27 @@
+const {Resvg} = require('@resvg/resvg-js'); const fs = require('fs');
+const [X, OUT] = process.argv.slice(2);
+const si = n => fs.readFileSync(`${X}/simple-icons-13.21.0/package/icons/${n}.svg`, 'utf8').match(/<path d="([^"]+)"/)[1];
+const lu = n => fs.readFileSync(`${X}/lucide-static-0.460.0/package/icons/${n}.svg`, 'utf8').replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>[\s\S]*$/, '');
+const save = (name, svg, size) => fs.writeFileSync(`${OUT}/${name}.png`, new Resvg(svg, {fitTo: {mode: 'width', value: size}}).render().asPng());
+// brand app icons
+save('whatsapp', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+ <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FFC7B"/><stop offset="1" stop-color="#28D146"/></linearGradient></defs>
+ <rect width="100" height="100" rx="23" fill="url(#g)"/>
+ <g transform="translate(20 20) scale(2.5)" fill="#fff"><path d="${si('whatsapp')}"/></g></svg>`, 512);
+save('instagram', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+ <defs><radialGradient id="g" cx="0.3" cy="1.07" r="1.5"><stop offset="0" stop-color="#fdf497"/><stop offset="0.05" stop-color="#fdf497"/>
+ <stop offset="0.45" stop-color="#fd5949"/><stop offset="0.6" stop-color="#d6249f"/><stop offset="0.9" stop-color="#285AEB"/></radialGradient></defs>
+ <rect width="100" height="100" rx="23" fill="url(#g)"/>
+ <g transform="translate(21 21) scale(2.4167)" fill="#fff"><path d="${si('instagram')}"/></g></svg>`, 512);
+// line-icon badges
+const badge = (name, icon, bg, fg, ring) => save(name, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+ <circle cx="50" cy="50" r="48" fill="${bg}"/>${ring ? `<circle cx="50" cy="50" r="45.5" fill="none" stroke="${ring}" stroke-width="3"/>` : ''}
+ <g transform="translate(24 24) scale(2.1667)" fill="none" stroke="${fg}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${lu(icon)}</g></svg>`, 512);
+const Y = '#FFC928', K = '#111111', W = '#FFFFFF', R = '#F04444', G = '#22C55E';
+badge('wheat', 'wheat', Y, K); badge('store', 'store', W, K); badge('users', 'users', W, K);
+badge('house', 'house', Y, K); badge('target', 'target', K, Y, Y); badge('brain', 'brain', W, K);
+badge('trending', 'trending-up', G, W); badge('rocket', 'rocket', K, Y, Y); badge('cart', 'shopping-cart', Y, K);
+badge('banknote', 'banknote', G, W); badge('coins', 'hand-coins', Y, K); badge('x', 'x', R, W); badge('check', 'check', G, W);
+badge('cat', 'cat', Y, K); badge('mappin', 'map-pin', R, W); badge('package', 'package', W, K); badge('sparkles', 'sparkles', K, Y, Y);
+badge('question', 'message-circle-question', W, K);
+console.log('done');
