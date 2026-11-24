@@ -54,7 +54,7 @@ export default function Capi({
   return (
     <motion.img
       key={p}
-      src={`/capi/${p}.webp`}
+      src={`${import.meta.env.BASE_URL}capi/${p}.webp`}
       alt={ALT[p]}
       draggable={false}
       className={`select-none pointer-events-none object-contain ${className}`}
@@ -79,6 +79,6 @@ export default function Capi({
 export function preloadCapi() {
   POSES.forEach((p) => {
     const img = new Image();
-    img.src = `/capi/${p}.webp`;
+    img.src = `${import.meta.env.BASE_URL}capi/${p}.webp`;
   });
 }

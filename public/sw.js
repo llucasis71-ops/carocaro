@@ -1,8 +1,10 @@
 // Conta Comigo — offline support: network first for pages, cache first for assets.
-const CACHE = 'conta-comigo-v2';
+const CACHE = 'conta-comigo-v3';
+// Paths are relative to this file, so the app works in any folder.
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/index.html', '/manifest.webmanifest', '/icon-192.png'])));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
   self.skipWaiting();
 });
 
@@ -26,10 +28,10 @@ self.addEventListener('fetch', (e) => {
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put('/index.html', copy));
+          caches.open(CACHE).then((c) => c.put('./index.html', copy));
           return res;
         })
-        .catch(() => caches.match('/index.html')),
+        .catch(() => caches.match('./index.html')),
     );
     return;
   }

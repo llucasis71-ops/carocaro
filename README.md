@@ -22,7 +22,8 @@ da escola: conta armada, "vai um", empréstimo e divisão pelo método da chave.
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # gera dist/ (deploy estático: Vercel, Netlify...)
+npm run build    # gera dist/
+npm run pacote   # gera conta-comigo-hostgator.zip (veja HOSTGATOR.md)
 ```
 
 Código principal: `src/lib/math.ts` (níveis e geração de contas), `src/lib/explain.ts`

@@ -214,7 +214,7 @@ export default function Landing() {
           No Conta Comigo, <span className="text-leaf">o jogo é a conta.</span>
         </h2>
         <img
-          src="/capi/banner.webp"
+          src={`${import.meta.env.BASE_URL}capi/banner.webp`}
           alt="Criança jogando no celular ao lado da Capi"
           className="w-full rounded-[2rem] border-2 border-sand"
           style={{ boxShadow: '0 6px 0 var(--color-sand)' }}
