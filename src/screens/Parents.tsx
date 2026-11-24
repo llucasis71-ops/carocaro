@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, TrendingUp, AlertTriangle, Settings, FileText, Clock, Flame, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Settings, FileText, Clock, Flame, CheckCircle2 } from 'lucide-react';
 import Capi from '../components/Capi';
 import Keypad from '../components/Keypad';
 import { Page, ProgressBar } from '../components/ui';
@@ -54,7 +54,7 @@ function PinGate({ onOk }: { onOk: () => void }) {
 
   return (
     <Page className="text-center">
-      <Lock className="mx-auto text-leaf-dark mt-4" size={40} />
+      <Capi size={130} pose="prancheta" className="mx-auto mt-2" />
       <h1 className="font-display text-3xl font-bold mt-2">Área dos pais</h1>
       <p className="font-semibold text-muted mt-1 mb-6">
         {forgot
@@ -119,7 +119,7 @@ function Dashboard() {
   return (
     <Page>
       <div className="flex items-center gap-3 mb-5">
-        <Capi size={56} mood="calm" />
+        <Capi size={72} pose="prancheta" />
         <div>
           <h1 className="font-display text-2xl font-bold">Painel dos pais</h1>
           <p className="text-sm font-bold text-muted">

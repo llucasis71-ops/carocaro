@@ -86,7 +86,7 @@ function River({ built, total, sticker, done }: { built: number; total: number; 
         animate={{ left: `calc(${pos}% - 24px)` }}
         transition={{ type: 'spring', damping: 15 }}
       >
-        <Capi size={52} mood={done ? 'wow' : 'happy'} bounce={done} />
+        <Capi size={56} pose={done ? 'joinha' : 'ideia'} bounce={done} />
       </motion.div>
     </div>
   );
@@ -209,7 +209,7 @@ export default function Play({ mode }: { mode: PlayMode }) {
         setMistakes((m) => m + 1);
         setAttempts(1);
         const t = pickOne(ENCOURAGE);
-        setMsg({ text: `${t} Quer tentar de novo ou quer que eu explique?`, mood: 'calm' });
+        setMsg({ text: `${t} Quer tentar de novo ou quer que eu explique?`, mood: 'oops' });
         speak(`${t} Quer tentar de novo, ou quer que eu explique?`);
         setStatus('retryOffer');
       } else {
@@ -253,6 +253,7 @@ export default function Play({ mode }: { mode: PlayMode }) {
         <TopBar title={title} backTo="/app/aventura" />
         <main className="max-w-xl mx-auto px-4 pt-6 pb-20 text-center">
           <River built={phase.count} total={phase.count} sticker={phase.sticker} done />
+          <Capi size={150} pose="trofeu" bounce className="mx-auto mt-6" />
           <motion.h2 initial={{ scale: 0.6 }} animate={{ scale: 1 }} className="font-display text-4xl font-bold text-leaf-dark mt-6">
             Fase completa!
           </motion.h2>
@@ -348,7 +349,7 @@ export default function Play({ mode }: { mode: PlayMode }) {
 
         {/* Capi feedback */}
         <div className="flex items-center gap-2 min-h-16">
-          <Capi size={56} mood={msg?.mood ?? 'happy'} bounce={status === 'right'} className="shrink-0" />
+          <Capi size={72} mood={msg?.mood ?? (status === 'afterExplain' ? 'think' : 'happy')} bounce={status === 'right'} className="shrink-0" />
           <AnimatePresence mode="wait">
             <motion.div
               key={msg?.text ?? 'idle'}
@@ -432,7 +433,7 @@ export default function Play({ mode }: { mode: PlayMode }) {
             exit={{ opacity: 0 }}
           >
             <motion.div initial={{ scale: 0.7 }} animate={{ scale: 1 }} className="bg-cream rounded-[2rem] p-6 text-center max-w-sm w-full">
-              <Capi size={110} mood="wow" bounce className="mx-auto" />
+              <Capi size={150} pose="trofeu" bounce className="mx-auto" />
               <h2 className="font-display text-3xl font-bold text-leaf-dark mt-2">Missão cumprida!</h2>
               <p className="font-semibold text-muted mt-2 mb-5">Você fez {goal} contas hoje. Amanhã tem mais!</p>
               <div className="flex flex-col gap-3">

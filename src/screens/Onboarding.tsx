@@ -13,7 +13,7 @@ export default function Onboarding() {
   return (
     <div className="min-h-dvh bg-cream dotgrid flex flex-col items-center justify-center px-5 py-10">
       <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md text-center">
-        <Capi size={140} mood={step === 0 ? 'happy' : 'wow'} bounce={step === 0} className="mx-auto" />
+        <Capi size={170} pose={step === 0 ? 'ideia' : step === 1 ? 'rosto' : 'joinha'} bounce={step === 0} className="mx-auto" />
         {step === 0 && (
           <>
             <h1 className="font-display text-4xl font-bold mt-4">Oi! Eu sou a Capi.</h1>

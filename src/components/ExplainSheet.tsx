@@ -67,7 +67,7 @@ export default function ExplainSheet({
         </div>
 
         <div className="flex items-start gap-2 mb-3">
-          <Capi size={64} mood={step.tip ? 'wow' : last ? 'happy' : 'think'} className="shrink-0" />
+          <Capi size={76} pose={step.tip ? 'ideia' : last ? 'joinha' : 'estudando'} className="shrink-0" />
           <AnimatePresence mode="wait">
             <motion.div
               key={i}

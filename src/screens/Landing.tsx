@@ -26,7 +26,7 @@ function Demo() {
   return (
     <div className="card p-5 max-w-md mx-auto">
       <div className="flex items-center gap-2 mb-3">
-        <Capi size={48} mood={state === 'right' ? 'wow' : 'happy'} bounce={state === 'right'} />
+        <Capi size={64} pose={state === 'right' ? 'joinha' : state === 'wrong' ? 'ops' : 'ideia'} bounce={state === 'right'} className="shrink-0" />
         <div className="font-bold">
           {state === 'right'
             ? 'Isso! Viu como é? Agora imagine isso todo dia, 10 minutinhos.'
@@ -98,7 +98,7 @@ function PhoneMock() {
     <div className="relative mx-auto w-[260px] h-[520px] rounded-[2.6rem] bg-forest p-2.5 shadow-2xl rotate-2">
       <div className="w-full h-full rounded-[2.1rem] bg-cream overflow-hidden flex flex-col">
         <div className="px-4 pt-5 pb-2 flex items-center gap-2">
-          <Capi size={36} mood="think" />
+          <Capi size={44} pose="estudando" />
           <div className="text-[11px] font-bold leading-tight bg-white border border-sand rounded-xl px-2 py-1">
             2 − 7 não dá. Pedimos 1 emprestado das dezenas...
           </div>
@@ -145,7 +145,7 @@ export default function Landing() {
     <div className="bg-cream text-ink">
       <header className="sticky top-0 z-30 bg-cream/90 backdrop-blur border-b-2 border-sand">
         <div className="max-w-5xl mx-auto flex items-center gap-2 px-4 h-16">
-          <Capi size={40} />
+          <Capi size={44} pose="rosto" />
           <div className="font-display text-2xl font-bold flex-1">
             Conta <span className="text-leaf">Comigo</span>
           </div>
@@ -205,6 +205,21 @@ export default function Landing() {
             frente.
           </p>
         </div>
+      </section>
+
+      {/* Banner */}
+      <section className="max-w-5xl mx-auto px-4 pt-14">
+        <p className="text-center text-lg font-semibold text-muted">E se a tela que ele já pede ensinasse matemática?</p>
+        <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mt-1 mb-6">
+          No Conta Comigo, <span className="text-leaf">o jogo é a conta.</span>
+        </h2>
+        <img
+          src="/capi/banner.webp"
+          alt="Criança jogando no celular ao lado da Capi"
+          className="w-full rounded-[2rem] border-2 border-sand"
+          style={{ boxShadow: '0 6px 0 var(--color-sand)' }}
+          loading="lazy"
+        />
       </section>
 
       {/* Demo */}
@@ -287,7 +302,7 @@ export default function Landing() {
 
       {/* Final CTA */}
       <section className="bg-leaf text-white py-14 text-center px-4">
-        <Capi size={110} mood="wow" bounce className="mx-auto" />
+        <Capi size={150} pose="trofeu" bounce className="mx-auto" />
         <h2 className="font-display text-3xl sm:text-4xl font-bold mt-3">Conta comigo? Conta com a Capi!</h2>
         <p className="font-semibold text-white/90 mt-2 mb-7">Comece hoje a missão do dia. Leva 10 minutos.</p>
         <button className="btn btn-sun text-xl py-4 px-8" onClick={start}>

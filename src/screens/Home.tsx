@@ -21,8 +21,8 @@ export default function Home() {
   return (
     <Page>
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-14 h-14 rounded-2xl bg-white border-2 border-sand flex items-center justify-center overflow-hidden">
-          <Capi size={52} />
+        <div className="w-14 h-14 rounded-2xl bg-white border-2 border-sand flex items-end justify-center overflow-hidden">
+          <Capi size={54} pose="rosto" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-display text-2xl font-semibold truncate">Oi, {profile.name}!</div>
@@ -39,8 +39,8 @@ export default function Home() {
         className="relative w-full text-left rounded-[2rem] overflow-hidden bg-leaf text-white p-5 mb-4"
         style={{ boxShadow: '0 6px 0 var(--color-leaf-dark)' }}
       >
-        <div className="absolute -right-6 -bottom-8 opacity-95">
-          <Capi size={150} mood="wow" />
+        <div className="absolute -right-2 bottom-2">
+          <Capi size={150} pose="ideia" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-8 water opacity-60" />
         <div className="relative max-w-[62%]">

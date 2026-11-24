@@ -103,7 +103,7 @@ export default function Race() {
         <TopBar title="Corrida da Tabuada" />
         <Page>
           <div className="flex items-center gap-3 mb-5">
-            <Capi size={72} mood="wow" />
+            <Capi size={90} pose="ideia" />
             <p className="font-bold text-muted">Quantas contas você acerta em 60 segundos? Escolha a pista:</p>
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -142,7 +142,7 @@ export default function Race() {
       <div className="min-h-dvh bg-cream">
         <TopBar title="Corrida da Tabuada" />
         <Page className="text-center">
-          <Capi size={120} mood="wow" bounce className="mx-auto" />
+          <Capi size={150} pose="trofeu" bounce className="mx-auto" />
           <h2 className="font-display text-4xl font-bold mt-2">{record ? 'Novo recorde!' : 'Fim da corrida!'}</h2>
           <div className="font-display text-7xl font-bold text-leaf-dark my-3">{score}</div>
           <p className="font-bold text-muted mb-6">contas certas · recorde: {Math.max(best[mode!] ?? 0, score)}</p>
@@ -172,7 +172,7 @@ export default function Race() {
         <div className="relative h-14 rounded-full bg-sand overflow-hidden">
           <motion.div className="absolute inset-y-0 left-0 bg-leaf/30" animate={{ width: `${((DURATION - time) / DURATION) * 100}%` }} />
           <motion.div className="absolute top-0.5" animate={{ left: `calc(${Math.min(score * 3, 90)}% )` }}>
-            <Capi size={50} />
+            <Capi size={50} pose="ideia" />
           </motion.div>
           <div className="absolute right-3 top-1/2 -translate-y-1/2 font-display text-2xl font-bold text-leaf-dark">{score}</div>
         </div>
