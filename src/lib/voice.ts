@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import { getState } from './store';
 
 /* ---------- Speech (pt-BR) ---------- */
@@ -40,31 +41,90 @@ export function sayify(text: string) {
     .replace(/"/g, '');
 }
 
+/* ---------- Voice availability (some in-app browsers have no voice) ---------- */
+
+export type VoiceStatus = 'unknown' | 'ok' | 'unavailable';
+let status: VoiceStatus = canSpeak() ? 'unknown' : 'unavailable';
+const statusListeners = new Set<() => void>();
+function setStatus(s: VoiceStatus) {
+  if (status === s || status === 'ok') return;
+  status = s;
+  statusListeners.forEach((l) => l());
+}
+export function useVoiceStatus(): VoiceStatus {
+  return useSyncExternalStore(
+    (cb) => {
+      statusListeners.add(cb);
+      return () => statusListeners.delete(cb);
+    },
+    () => status,
+  );
+}
+
+// iOS/Android only allow speech after a user gesture: "unlock" it on the first tap.
+if (canSpeak()) {
+  const unlock = () => {
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      speechSynthesis.speak(u);
+    } catch {
+      /* ignore */
+    }
+  };
+  window.addEventListener('pointerdown', unlock, { once: true, capture: true });
+}
+
 let speakToken = 0;
+let misses = 0;
 
 export function speak(text: string, onEnd?: () => void) {
   const token = ++speakToken;
-  if (!canSpeak() || !getState().settings.voice) {
-    if (onEnd) setTimeout(() => token === speakToken && onEnd(), 1800 + text.length * 35);
+  if (!canSpeak() || !getState().settings.voice || status === 'unavailable') {
+    if (onEnd) setTimeout(() => token === speakToken && onEnd(), 1800 + text.length * 45);
     return;
   }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(sayify(text));
-  u.lang = 'pt-BR';
-  if (voice) u.voice = voice;
-  u.rate = 0.98;
-  u.pitch = 1.1;
   let done = false;
+  let started = false;
   const finish = () => {
     if (done || token !== speakToken) return;
     done = true;
     onEnd?.();
   };
+  const u = new SpeechSynthesisUtterance(sayify(text));
+  u.lang = 'pt-BR';
+  if (!voice) voice = pickVoice();
+  if (voice) u.voice = voice;
+  u.rate = 0.98;
+  u.pitch = 1.1;
+  u.onstart = () => {
+    started = true;
+    misses = 0;
+    setStatus('ok');
+  };
   u.onend = finish;
-  u.onerror = finish;
-  // Some Android voices never fire onend — safety net.
-  setTimeout(finish, 2500 + text.length * 90);
-  speechSynthesis.speak(u);
+  u.onerror = (e) => {
+    if ((e as SpeechSynthesisErrorEvent).error === 'synthesis-unavailable') setStatus('unavailable');
+    finish();
+  };
+  // If speech never starts, this browser has no working voice: carry on silently.
+  setTimeout(() => {
+    if (token !== speakToken || started) return;
+    misses += 1;
+    if (misses >= 2) setStatus('unavailable');
+    speechSynthesis.cancel();
+    setTimeout(finish, 1500 + text.length * 45);
+  }, 2500);
+  // Some Android voices never fire onend: safety net.
+  setTimeout(finish, 4000 + text.length * 90);
+
+  // Chrome drops an utterance spoken right after cancel(): give it a moment.
+  speechSynthesis.cancel();
+  setTimeout(() => {
+    if (token !== speakToken) return;
+    speechSynthesis.speak(u);
+    if (speechSynthesis.paused) speechSynthesis.resume();
+  }, 80);
 }
 
 export function stopSpeaking() {

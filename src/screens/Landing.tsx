@@ -20,7 +20,7 @@ function Demo() {
 
   const board =
     armed.kind === 'column'
-      ? { ...armed, result: Object.fromEntries(input.split('').reverse().map((d, i) => [i, d])) }
+      ? { ...armed, result: Object.fromEntries(input.split('').map((d, i) => [i, d])), hl: input.length < armed.width ? input.length : null }
       : armed;
 
   return (
@@ -32,7 +32,7 @@ function Demo() {
             ? 'Isso! Viu como é? Agora imagine isso todo dia, 10 minutinhos.'
             : state === 'wrong'
               ? 'Errou? Sem problema! Toque em "Me explica" e veja a mágica.'
-              : 'Teste você mesmo: quanto é 47 + 38? Erre de propósito, se quiser!'}
+              : 'Teste você mesmo: resolva 47 + 38 começando pela unidade, como no caderno. Erre de propósito, se quiser!'}
         </div>
       </div>
       <div className={`flex justify-center bg-cream rounded-2xl py-3 mb-4 ${state === 'wrong' ? 'wobble' : ''}`}>
@@ -62,7 +62,7 @@ function Demo() {
           value={input}
           onChange={setInput}
           onSubmit={() => {
-            if (Number(input) === problem.answer) {
+            if (Number(input.split('').reverse().join('')) === problem.answer) {
               sfx('right');
               speak('Isso! Mandou bem!');
               setState('right');
@@ -72,6 +72,7 @@ function Demo() {
             }
           }}
           maxLength={3}
+          keepZeros
           disabled={state === 'explain'}
         />
       )}

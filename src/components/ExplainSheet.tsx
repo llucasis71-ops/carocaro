@@ -5,7 +5,8 @@ import Capi from './Capi';
 import BoardView from './BoardView';
 import { explain } from '../lib/explain';
 import { Problem, OP_SYMBOL } from '../lib/math';
-import { speak, stopSpeaking } from '../lib/voice';
+import { speak, stopSpeaking, useVoiceStatus } from '../lib/voice';
+import { useStore } from '../lib/store';
 
 export default function ExplainSheet({
   problem,
@@ -20,6 +21,8 @@ export default function ExplainSheet({
   const [i, setI] = useState(0);
   const [auto, setAuto] = useState(true);
   const step = steps[i];
+  const voiceStatus = useVoiceStatus();
+  const voiceOn = useStore((s) => s.settings.voice);
   const last = i === steps.length - 1;
 
   useEffect(() => {
@@ -66,6 +69,12 @@ export default function ExplainSheet({
           ))}
         </div>
 
+        {voiceOn && voiceStatus === 'unavailable' && (
+          <div className="mb-3 rounded-2xl bg-sun/25 border-2 border-sun px-3 py-2 text-sm font-bold text-forest">
+            🔇 Este navegador não tem a voz da Capi. Para ouvir, abra o site no Chrome (Android) ou no Safari (iPhone). A
+            explicação continua aqui por escrito.
+          </div>
+        )}
         <div className="flex items-start gap-2 mb-3">
           <Capi size={76} pose={step.tip ? 'ideia' : last ? 'joinha' : 'estudando'} className="shrink-0" />
           <AnimatePresence mode="wait">

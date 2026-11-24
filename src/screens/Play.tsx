@@ -184,9 +184,13 @@ export default function Play({ mode }: { mode: PlayMode }) {
     [solved, phase, mistakes, mode, missionCelebrated],
   );
 
+  // Armed (vertical) problems are written like in the notebook: units first, right to left.
+  const rtl = isColumnProblem(problem) && problem.op !== 'div';
+  const typedNumber = rtl ? Number(input.split('').reverse().join('')) : Number(input);
+
   const submit = () => {
     lastAct.current = Date.now();
-    const correct = Number(input) === problem.answer;
+    const correct = typedNumber === problem.answer;
     if (status === 'answer') {
       if (attempts === 0) {
         const res = recordAttempt(problem, correct, adapt);
@@ -224,7 +228,12 @@ export default function Play({ mode }: { mode: PlayMode }) {
       } else {
         sfx('wrong');
         setShake((x) => x + 1);
-        setMsg({ text: `A resposta é ${problem.answer}. Digite ${problem.answer} para continuar.`, mood: 'calm' });
+        setMsg({
+          text: rtl
+            ? `A resposta é ${problem.answer}. Comece pela unidade: digite ${String(problem.answer).split('').reverse().join(', depois ')}.`
+            : `A resposta é ${problem.answer}. Digite ${problem.answer} para continuar.`,
+          mood: 'calm',
+        });
       }
     }
   };
@@ -235,12 +244,13 @@ export default function Play({ mode }: { mode: PlayMode }) {
     if (!armed) return null;
     if (armed.kind === 'column') {
       const result: Record<number, string> = {};
-      input.split('').reverse().forEach((d, i) => (result[i] = d));
-      return { ...armed, width: Math.max(armed.width, input.length), result };
+      input.split('').forEach((d, i) => (result[i] = d)); // first typed digit = units
+      const hl = status === 'answer' || status === 'afterExplain' ? (input.length < armed.width ? input.length : null) : null;
+      return { ...armed, width: Math.max(armed.width, input.length), result, hl };
     }
     if (armed.kind === 'longdiv') return { ...armed, quotient: input };
     return null;
-  }, [armed, input]);
+  }, [armed, input, status]);
 
   const keypadDisabled = status === 'right' || status === 'done' || status === 'explain' || status === 'retryOffer';
 
@@ -325,7 +335,7 @@ export default function Play({ mode }: { mode: PlayMode }) {
         )}
 
         {/* Problem */}
-        <motion.div key={shake} className={`card px-4 py-5 ${shake ? 'wobble' : ''}`}>
+        <motion.div key={shake} data-a={problem.a} data-b={problem.b} data-op={problem.op} className={`card px-4 py-5 ${shake ? 'wobble' : ''}`}>
           {armedWithInput ? (
             <div className="flex justify-center">
               {armedWithInput.kind === 'column' ? <ColumnView board={armedWithInput} /> : <LongDivView board={armedWithInput} />}
@@ -362,7 +372,9 @@ export default function Play({ mode }: { mode: PlayMode }) {
                 (status === 'afterExplain'
                   ? 'Agora é sua vez: digite a resposta!'
                   : armed
-                    ? 'Resolva no quadro, começando pela direita.'
+                    ? rtl
+                      ? 'Comece pela unidade, à direita. Digite um algarismo de cada vez.'
+                      : 'Resolva no quadro: comece pela esquerda.'
                     : 'Quanto dá?')}
             </motion.div>
           </AnimatePresence>
@@ -386,7 +398,7 @@ export default function Play({ mode }: { mode: PlayMode }) {
             </button>
           </div>
         ) : (
-          <Keypad value={input} onChange={setInput} onSubmit={submit} disabled={keypadDisabled} />
+          <Keypad value={input} onChange={setInput} onSubmit={submit} disabled={keypadDisabled} keepZeros={rtl} maxLength={armed?.kind === 'column' ? armed.width : 5} />
         )}
 
         {status === 'afterExplain' && (

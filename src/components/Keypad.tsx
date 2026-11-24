@@ -8,12 +8,15 @@ export default function Keypad({
   onSubmit,
   disabled,
   maxLength = 5,
+  keepZeros = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   onSubmit: () => void;
   disabled?: boolean;
   maxLength?: number;
+  /** Column mode: digits go units first, so a leading 0 is meaningful. */
+  keepZeros?: boolean;
 }) {
   const press = (k: string) => {
     if (disabled) return;
@@ -23,7 +26,7 @@ export default function Keypad({
       if (value.length) onSubmit();
       return;
     } else if (value.length < maxLength) {
-      onChange(value === '0' ? k : value + k);
+      onChange(value === '0' && !keepZeros ? k : value + k);
     }
     sfx('tap');
   };
