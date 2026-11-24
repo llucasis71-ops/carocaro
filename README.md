@@ -1,20 +1,29 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Conta Comigo
 
-# Run and deploy your AI Studio app
+App de matemática para crianças do 1º ao 5º ano. O jogo só avança com a conta certa e,
+quando a criança erra, a **Capi** (uma capivara) explica passo a passo, com voz, do jeito
+da escola: conta armada, "vai um", empréstimo e divisão pelo método da chave.
 
-This contains everything you need to run your app locally.
+## O que tem
 
-View your app in AI Studio: https://ai.studio/apps/2d24189a-8259-4fee-bd13-468fd79c8227
+- **Página de apresentação** (`/`) com demonstração interativa.
+- **App** (`/#/app`), instalável no celular (PWA):
+  - Aventura no Rio das Contas: 10 fases; cada acerto é uma tábua da ponte.
+  - Missão do dia: meta de 10, 20 ou 30 contas, priorizando o que a criança mais erra.
+  - Treino livre por operação, com nível que se ajusta sozinho (sobe com 5 acertos seguidos).
+  - "Me explica": explicação animada e narrada (bolinhas, grupos, conta armada, chave).
+  - Corrida da Tabuada (60 s), álbum de figurinhas e estrelas.
+  - Folhinha para imprimir com gabarito, inclusive focada "onde trava".
+  - Painel dos pais (com senha): semana, acerto por operação, pontos fracos e ajustes.
+- O progresso fica salvo no próprio aparelho (localStorage), sem servidor.
 
-## Run Locally
+## Rodar
 
-**Prerequisites:**  Node.js
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # gera dist/ (deploy estático: Vercel, Netlify...)
+```
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Código principal: `src/lib/math.ts` (níveis e geração de contas), `src/lib/explain.ts`
+(explicações passo a passo), `src/screens/` (telas).
